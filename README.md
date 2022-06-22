@@ -480,3 +480,53 @@ class Flight_Bot:
         print('sent email.....')
         
   # Insa in timp ce rulam imi apareau erori legate de biblioteci, le am instalat, dezinstalat si reinstalat, iar erorile continuau sa apara. Am cautat solutii pe net, am incercat mai multe variante, dar printre toate comenzile date, am reusit sa imi stric masina virtuala. Am fost nevoita sa o dezinstalez, sa o reinstales si sa reiau procesul de instalare al aplicatiilor necesare pentru proiectul meu 
+
+
+
+# Day6 - Discutand cu o colega, am aflat ca avem aceeasi tema, fapt ce a determinat sa ma razgandesc. Am decis sa fac web scraping pe un dictionar online. Am inceput prin a face interfata. 
+# Pentru a realiza interfata ma folosesc de biblioteca tkinter, iar pentru asta am folosit urmatoarea documentatie: https://youtu.be/z1nN5pvhdA8, https://docs.python.org/3/library/tk.html, https://stackoverflow.com/questions/3352918/how-to-center-a-window-on-the-screen-in-tkinter, https://www.pythontutorial.net/tkinter/tkinter-stringvar/, https://www.geeksforgeeks.org/how-to-use-images-as-backgrounds-in-tkinter/
+
+
+# Codul realizat de mine:
+
+from email import header
+from struct import pack
+import tkinter as tk
+from PIL import Image, ImageTk
+
+def closeApp():
+    window.destroy
+
+window = tk.Tk()
+
+window.title("Dictionary")
+window.geometry("1000x600")
+
+bg = ImageTk.PhotoImage(file='book.png')
+
+label1 = tk.Label(window, image = bg)
+label1.place(x = 0, y = 0)
+  
+label2 = tk.Label(window, text = "Explore Definition & Meaning", height='3', width='40', font=("Calibri 16 bold italic"))
+label2.pack(pady = 50)
+
+
+frame1 =  tk.Frame(window)
+frame1.pack(pady=20)
+
+introduceWord = tk.Label(frame1, text='Word: ')
+introduceWord.grid(column=0, row=0, padx=5, pady=5)
+
+word = tk.StringVar()
+wordEntry = tk.Entry(frame1, textvariable=word, width=10)
+wordEntry.focus()
+wordEntry.grid(column=1, row=0, padx=5, pady=5)
+
+frame2 = tk.Frame(window)
+frame2.pack(pady = 40)
+
+button1 = tk.Button(frame2,text="Search")
+button1.pack(side='bottom')
+  
+
+window.mainloop()
