@@ -647,3 +647,261 @@ window.mainloop()
 
 # In acest moment aplicatia ruleaza, dar nu relealizeaza task-urile necesare.
 
+
+# Day8 -  Pentru a reusi sa fac legatura intre interfata si botul realizat de mine, au fost nevoie de cateva modificari, atat la nivelulul metodelor din bot, cat si in codul interfetei.
+Metoda listOfWords era inutila, codul trebuia introdus in interiorul metodei searchWord, deoarece aici se realizeaza manipularea datelor extrase prin scraping.
+Botul arata acum asa :
+
+class DictionaryBot:
+
+    def __init__(self):
+        self.path = "/usr/local/bin/chromedriver" 
+
+    def searchWord(self,word):
+        self.driver = webdriver.Chrome(self.path) 
+        self.driver.get("https://dexonline.ro/") 
+        try:
+            searchW = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.NAME, "cuv"))
+            )
+            searchW.clear() 
+            searchW.send_keys(word)
+            searchW.send_keys(Keys.RETURN)
+            selections = self.driver.find_elements_by_css_selector("span[class='def html']")
+            selectionList = [[value.text] for value in selections]
+            self.driver.quit()
+            return selectionList
+        except:
+            return []
+# Pentru a functiona interfata utilizand botul, am fost nevoita sa creez o instanta a botului de care sa ma ajut sa se poata realiza cautarea cuvintelor prin interfata. De asemenea dupa ce s-a realizat retinerea definitiilor in lista, am afisat primele 5 definitii regasite in pagina de sinteza a dex – ului printr-o fereastra de informare.
+# Codul arata acum asa
+
+from email import header
+from struct import pack
+import tkinter as tk
+from PIL import Image, ImageTk
+from dictionary import DictionaryBot as D
+from tkinter.messagebox import showinfo
+
+obj=D()
+
+def closeApp():
+    print("Leaving...")
+    window.destroy()
+
+
+window = tk.Tk()
+
+window.title("Dictionary")
+window.geometry("1000x600")
+
+bg = ImageTk.PhotoImage(file='book.png')
+
+label1 = tk.Label(window, image = bg)
+label1.place(x = 0, y = 0)
+  
+label2 = tk.Label(window, text = "Explore Definition & Meaning", height='3', width='40', bg="tan", fg="white", font=("Calibri 16 bold italic"))
+label2.pack(pady = 50)
+
+
+frame1 =  tk.Frame(window, bg="tan")
+frame1.pack(pady=20)
+
+introduceWord = tk.Label(frame1, text='Word: ', bg="tan")
+introduceWord.grid(column=0, row=0, padx=5, pady=5)
+
+word = tk.StringVar()
+wordEntry = tk.Entry(frame1, textvariable=word, width=10)
+wordEntry.focus()
+wordEntry.grid(column=1, row=0, padx=5, pady=5)
+
+def runApp():
+    listO=obj.searchWord(word.get())
+    print(listO)
+    bigList=[x[0] for x in  listO]
+    messageR='\n'.join(bigList[:5])
+    showinfo('Result',messageR)
+
+frame2 = tk.Frame(window)
+frame2.pack(pady = 40)
+
+button1 = tk.Button(frame2,text="Search", command=runApp, bg="dark green", fg="white")
+button1.grid(column = 0, row = 0)
+  
+button1 = tk.Button(frame2,text="Close", command=closeApp, bg="dark red", fg="white")
+button1.grid(column = 1, row = 0)
+  
+window.mainloop()
+
+
+# In plus am adaugat 2 butoane, unul care afiseaza sinteza explicatiilor oferite de dex si unul care afiseaza definitiile complete (primele 3). Am creeat si al 3-le buton, care ar trebui sa imi afiseze declinarile, insa nu este functional.
+
+# Varianta finala a codului este :
+
+
+# dictionaryBot.py
+
+from selenium import webdriver
+import time
+import click
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+class DictionaryBot:
+
+    def __init__(self):
+        self.path = "/usr/local/bin/chromedriver" 
+
+        
+
+    def searchWord(self,word):
+        self.driver = webdriver.Chrome(self.path) 
+        self.driver.get("https://dexonline.ro/") 
+        try:
+            searchW = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.NAME, "cuv"))
+            )
+            searchW.clear() 
+            searchW.send_keys(word)
+            searchW.send_keys(Keys.RETURN)
+            selections = self.driver.find_elements_by_css_selector("span[class='def html']")
+            selectionList = [[value.text] for value in selections]
+            self.driver.quit()
+            return selectionList
+        except:
+            return []
+
+    def searchWord1(self, word):
+        self.driver = webdriver.Chrome(self.path) 
+        self.driver.get("https://dexonline.ro/") 
+        try:
+            searchW = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.NAME, "cuv"))
+            )
+            searchW.clear() 
+            searchW.send_keys(word)
+            searchW.send_keys(Keys.RETURN)
+
+            searchW = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.LINK_TEXT, "definiții"))
+            )   
+            searchW.click()
+
+            selections = self.driver.find_elements_by_class_name("def")
+            selectionList = [[value.text] for value in selections]
+            self.driver.quit()
+            return selectionList
+        except:
+            return []
+
+    def searchWord2(self, word):
+        self.driver = webdriver.Chrome(self.path) 
+        self.driver.get("https://dexonline.ro/") 
+        try:
+            searchW = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.NAME, "cuv"))
+            )
+            searchW.clear() 
+            searchW.send_keys(word)
+            searchW.send_keys(Keys.RETURN)
+
+            searchW = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.LINK_TEXT, "declinări"))
+            )
+            searchW.click()
+
+            selections = self.driver.find_elements_by_class_name("tab-pane")
+            selectionList = [[value.text] for value in selections]
+            self.driver.quit()
+            return selectionList
+        except:
+            return []
+
+
+# interfata.py
+
+
+from email import header
+from struct import pack
+import tkinter as tk
+from PIL import Image, ImageTk
+from dictionaryTest import DictionaryBot as D
+from tkinter.messagebox import showinfo
+obj=D()
+
+def closeApp():
+    print("Leaving...")
+    window.destroy()
+
+
+window = tk.Tk()
+
+window.title("Dictionary")
+window.geometry("1000x600")
+
+bg = ImageTk.PhotoImage(file='book.png')
+
+label1 = tk.Label(window, image = bg)
+label1.place(x = 0, y = 0)
+  
+label2 = tk.Label(window, text = "Explore Definition & Meaning", height='3', width='40', bg="tan", fg="white", font=("Calibri 16 bold italic"))
+label2.pack(pady = 50)
+
+
+frame1 =  tk.Frame(window, bg="tan")
+frame1.pack(pady=20)
+
+introduceWord = tk.Label(frame1, text='Word: ', bg="tan")
+introduceWord.grid(column=0, row=0, padx=5, pady=5)
+
+word = tk.StringVar()
+wordEntry = tk.Entry(frame1, textvariable=word, width=10)
+wordEntry.focus()
+wordEntry.grid(column=1, row=0, padx=5, pady=5)
+
+def runApp():
+    listO=obj.searchWord(word.get())
+    print(listO)
+    bigList=[x[0] for x in  listO]
+    messageR='\n'.join(bigList[:5])
+    showinfo('Result',messageR)
+
+def runApp1():
+    listO=obj.searchWord1(word.get())
+    print(listO)
+    bigList=[x[0] for x in  listO]
+    messageR='\n'.join(bigList[:3])
+    showinfo('Result',messageR)
+
+def runApp2():
+    listO=obj.searchWord2(word.get())
+    print(listO)
+    bigList=[x[0] for x in  listO]
+    messageR='\n'.join(bigList[:3])
+    showinfo('Result',messageR)
+
+
+frame2 = tk.Frame(window)
+frame2.pack(pady = 40)
+
+button1 = tk.Button(frame2,text="Synthesis", command=runApp, bg="dark green", fg="white")
+button1.grid(column = 0, row = 0)
+  
+button2 = tk.Button(frame2,text="Definitions", command=runApp1, bg="dark green", fg="white")
+button2.grid(column = 1, row = 0)
+    
+#button3 = tk.Button(frame2,text="Declensions", command=runApp2, bg="dark green", fg="white")
+#button3.grid(column = 2, row = 0)
+    
+button4 = tk.Button(frame2,text="Close", command=closeApp, bg="dark red", fg="white")
+button4.grid(column = 3, row = 0)
+  
+window.mainloop()
+
+
+#
+
+
