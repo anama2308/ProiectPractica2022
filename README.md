@@ -530,3 +530,132 @@ button1.pack(side='bottom')
   
 
 window.mainloop()
+
+
+# Day7 - Am realizat partea de cod pentru scraping, am reusit sa introduc un cuvant de la tastaura, sa-l caut in dex si sa extrag definitiile aferente regasite in pagina de sinteza si sa afisez pentru a verifica.
+
+from selenium import webdriver
+import time
+import click
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+
+
+path = "/usr/local/bin/chromedriver" 
+
+driver = webdriver.Chrome(path) 
+driver.get("https://dexonline.ro/") 
+
+time.sleep(5)
+
+
+try:
+    searchW = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.NAME, "cuv"))
+     )
+    searchW.clear() #inainte de a trimite key verifica daca nu exista alta, iar daca exista o sterge, altfel ar fi facu append
+    searchW.send_keys("test")
+    searchW.send_keys(Keys.RETURN)
+except:
+    pass
+
+time.sleep(5)
+
+
+selections = driver.find_elements_by_css_selector("span[class='def html'")
+selectionList = [[value.text] for value in selections]
+
+for item in selectionList:
+    print(item)
+
+
+# A fost nevoie de relizarea unei clase Bot, pentru a putea dace legatura cu interfata. 
+
+class DictionaryBot:
+
+    def __init__(self):
+        self.path = "/usr/local/bin/chromedriver" 
+
+        
+
+    def searchWord(self,word):
+        self.driver = webdriver.Chrome(self.path) 
+        self.driver.get("https://dexonline.ro/") 
+        try:
+            searchW = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.NAME, "cuv"))
+            )
+            searchW.clear() 
+            searchW.send_keys(word)
+            searchW.send_keys(Keys.RETURN)
+
+        except:
+            pass
+
+    def listOfWords(self):
+        selections = self.driver.find_elements_by_css_selector("span[class='def html']")
+        selectionList = [[value.text] for value in selections]
+        
+        if selectionList == []:
+            self.driver.quit()
+
+# A fost nevoie sa actualizez si codul din interfata in urmatorul fel: 
+
+from email import header
+from struct import pack
+import tkinter as tk
+from PIL import Image, ImageTk
+from dictionary import DictionaryBot as D
+
+
+def closeApp():
+    print("Leaving...")
+    window.destroy()
+
+def runApp():
+    D.__init__
+    D.searchWord
+    D.listOfWords
+
+window = tk.Tk()
+
+window.title("Dictionary")
+window.geometry("1000x600")
+
+bg = ImageTk.PhotoImage(file='book.png')
+
+label1 = tk.Label(window, image = bg)
+label1.place(x = 0, y = 0)
+  
+label2 = tk.Label(window, text = "Explore Definition & Meaning", height='3', width='40', bg="tan", fg="white", font=("Calibri 16 bold italic"))
+label2.pack(pady = 50)
+
+
+frame1 =  tk.Frame(window, bg="tan")
+frame1.pack(pady=20)
+
+introduceWord = tk.Label(frame1, text='Word: ', bg="tan")
+introduceWord.grid(column=0, row=0, padx=5, pady=5)
+
+word = tk.StringVar()
+wordEntry = tk.Entry(frame1, textvariable=word, width=10)
+wordEntry.focus()
+wordEntry.grid(column=1, row=0, padx=5, pady=5)
+
+frame2 = tk.Frame(window)
+frame2.pack(pady = 40)
+
+button1 = tk.Button(frame2,text="Search", command=runApp, bg="dark green", fg="white")
+button1.grid(column = 0, row = 0)
+  
+button1 = tk.Button(frame2,text="Close", command=closeApp, bg="dark red", fg="white")
+button1.grid(column = 1, row = 0)
+  
+window.mainloop()
+
+# In acest moment aplicatia ruleaza, dar nu relealizeaza task-urile necesare.
+
