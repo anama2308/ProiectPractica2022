@@ -534,16 +534,7 @@ window.mainloop()
 
 # Day7 - Am realizat partea de cod pentru scraping, am reusit sa introduc un cuvant de la tastaura, sa-l caut in dex si sa extrag definitiile aferente regasite in pagina de sinteza si sa afisez pentru a verifica.
 
-from selenium import webdriver
-import time
-import click
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-
-
+# dictonary.py
 
 path = "/usr/local/bin/chromedriver" 
 
@@ -575,6 +566,8 @@ for item in selectionList:
 
 # A fost nevoie de relizarea unei clase Bot, pentru a putea dace legatura cu interfata. 
 
+# bot.py
+
 class DictionaryBot:
 
     def __init__(self):
@@ -605,12 +598,7 @@ class DictionaryBot:
 
 # A fost nevoie sa actualizez si codul din interfata in urmatorul fel: 
 
-from email import header
-from struct import pack
-import tkinter as tk
-from PIL import Image, ImageTk
-from dictionary import DictionaryBot as D
-
+# interfata.py
 
 def closeApp():
     print("Leaving...")
